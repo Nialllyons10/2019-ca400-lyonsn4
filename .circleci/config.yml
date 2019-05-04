@@ -3,6 +3,24 @@ jobs:
   build:
     docker:
       - image: circleci/ruby:2.4.1
+      
     steps:
       - checkout
-      - run: echo "A first hello"
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - dependencies-cache-{{ checksum "package.json" }}
+
+      - run:
+          name: install-dependencies
+          command: npm i
+          
+      - run:
+          name: code-coverage
+          command: bash <(curl -s https://codecov.io/bash)
+
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
